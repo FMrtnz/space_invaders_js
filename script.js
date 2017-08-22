@@ -10,7 +10,7 @@ var paddingY = pixel * 5;
 var paddingX = pixel * 25;
 var playerX = (canvas.width / 2) - (paddingX / 2);
 var playerY = canvas.height - paddingY;
-var dX = 10;
+var dX = 7;
 
 var rightPressed = false;
 var leftPressed = false;
@@ -45,6 +45,7 @@ var last2 = enemys[last].length - 1;
 
 // variables for shooting
 var shootState = false;
+var paddingShoot = pixel*2
 var shootX = 0;
 var shootY = canvas.height - paddingY * 4;
 var dY = 15;
@@ -122,7 +123,7 @@ function drawPlayer() {
 // Code to shoot function
 function drawShoot() {
     ctx.beginPath();
-    ctx.rect(shootX, shootY, pixel, pixel);
+    ctx.rect(shootX, shootY, paddingShoot, paddingShoot);
     ctx.fillStyle = "white";
     ctx.fill();
     ctx.closePath();
@@ -200,8 +201,11 @@ function enemysMove() {
 
 function gameOver(n, r) {
     if (score == nEnemyC * nEnemyR) {
-        alert('You completed the game ! You win !');
-        document.location.reload();
+        setTimeout(function() {
+          alert('You completed the game ! You win !')
+          document.location.reload();
+        }, 50);
+        // alert('You completed the game ! You win !');
     } else if (enemys[n][r].y >= canvas.height - offsetEnemyY) {
         alert('You lose ! Game Over !')
         document.location.reload();
@@ -212,7 +216,7 @@ function gameStatus() {
     for (n = 0; n < nEnemyC; n++) {
         for (r = 0; r < nEnemyR; r++) {
             var enemy = enemys[n][r];
-            var conditionX = shootX > enemy.x - (pixel * 5) && shootX < enemy.x + (pixel * 5);
+            var conditionX = shootX + paddingShoot/2 > enemy.x - (pixel * 7) && shootX + paddingShoot/2 < enemy.x + (pixel * 7);
             var conditionY = shootY < enemy.y && shootY < enemy.y - (pixel * 10);
             if (enemy.status == 1) {
                 if (conditionX && conditionY) {

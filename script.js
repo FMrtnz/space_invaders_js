@@ -7,19 +7,31 @@ var paddingY = 10;
 var paddingX = canvas.width/10;
 var playerX = (canvas.width/2) - (paddingX/2);
 var playerY = canvas.height-paddingY;
-var dX = 25;
+var dX = 10;
 
 var rightPressed = false;
 var leftPressed = false;
 
 // my personnal pixel unity for the game
-var pixel = canvas.width/100;
+var pixel = canvas.width/200;
+var offsetEnemyX = pixel*17;
+var offsetEnemyY = pixel*11;
+var nEnemyC = 10;
+var nEnemyR = 5;
+
+var enemys = [];
+for (n=0; n<nEnemyC; n++) {
+  enemys[n] = [];
+  for (r=0; r<nEnemyR; r++) {
+      enemys[n][r] = {x: 0, y: 0, status: 1};
+  }
+}
 
 // variables for shooting
 var shootState = false;
 var shootX = 0;
 var shootY = canvas.height - paddingY*4;
-var dY = 20;
+var dY = 10;
 
 // var score = 0
 
@@ -54,9 +66,10 @@ function keyUpHandler(e){
 };
 
 function keyUpShoot(e) {
+  // 32 => "space barre"
   if(e.keyCode == 32) {
     shootState = true;
-    shootX = playerX + paddingX/2 - pixel/2;
+    shootX = playerX + (paddingX - pixel)/2;
   };
 }
 
@@ -86,6 +99,78 @@ function drawPlayer() {
   ctx.closePath();
 };
 
+function drawBodyEnemy(x, y) {
+  ctx.beginPath();
+  ctx.rect(x - pixel*3, y -pixel*2, pixel*7, pixel*5);
+  ctx.rect(x - pixel*3, y + pixel*3, pixel, pixel);
+  ctx.rect(x + pixel*3, y + pixel*3, pixel, pixel);
+  ctx.rect(x - pixel*2, y + pixel*4, pixel*2, pixel);
+  ctx.rect(x + pixel, y + pixel*4, pixel*2, pixel);
+  ctx.rect(x - pixel*5, y + pixel, pixel, pixel*3);
+  ctx.rect(x + pixel*5, y + pixel, pixel, pixel*3);
+  ctx.rect(x - pixel*5, y, pixel*11, pixel);
+  ctx.rect(x - pixel*4, y - pixel, pixel*9, pixel);
+  ctx.rect(x - pixel*2, y - pixel*3, pixel*5, pixel);
+  ctx.rect(x - pixel*3, y - pixel*4, pixel*7, pixel);
+  ctx.fillStyle = "white";
+  ctx.fill();
+  ctx.closePath();
+};
+
+function drawEyesEnemy(x, y) {
+  ctx.beginPath();
+  ctx.rect(x - pixel*2, y, pixel, pixel);
+  ctx.rect(x + pixel*2, y, pixel, pixel);
+  ctx.rect(x - pixel, y - pixel*3, pixel*3, pixel);
+  ctx.rect(x - pixel*2, y - pixel*4, pixel*5, pixel);
+  ctx.fillStyle = "black";
+  ctx.fill();
+  ctx.closePath();
+};
+
+function drawEnemy(x, y) {
+  drawBodyEnemy(x, y);
+  drawEyesEnemy(x, y);
+};
+
+function drawEnemys() {
+  for (n=0; n<nEnemyC; n++) {
+    for (r=0; r<nEnemyR; r++) {
+        if(enemys[n][r].status == 1) {
+          var enemyX = (n*offsetEnemyX) + canvas.width/10;
+          var enemyY = (r*offsetEnemyY) + offsetEnemyY;
+          enemys[n][r].x = enemyX;
+          enemys[n][r].y = enemyY;
+          drawEnemy(enemyX, enemyY);
+        }
+      }
+    }
+}
+
+function enemysDestroy(){
+  for (n=0; n<nEnemyC; n++) {
+    for (r=0; r<nEnemyR; r++) {
+        var enemy = enemys[n][r];
+        var conditionX = shootX > enemy.x - (pixel*5) && shootX < enemy.x + (pixel*5);
+        var conditionY = shootY < enemy.y && shootY < enemy.y - (pixel*10);
+        if(enemy.status == 1){
+          if(conditionX && conditionY) {
+            shootState = false;
+            enemy.status = 0;
+            shootY = canvas.height - paddingY*4;
+            // score++;
+            // if(score == brickRowCount*brickColumnCount) {
+            //   alert('You completed the game ! Congradultions !');
+            //   document.location.reload();
+            // }
+          } else if (shootY <= 0) {
+            shootState = false;
+            shootY = canvas.height - paddingY*4;
+          };
+        }
+      }
+    }
+}
 
 // Code to shoot function
 function drawShoot() {
@@ -102,7 +187,7 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawPlayer();
-
+  drawEnemys();
   //This code define the move on left/right and the speed
   if(rightPressed && playerX < canvas.width - paddingX/2) {
     playerX += dX;
@@ -117,10 +202,7 @@ function draw() {
       shootY -= dY;
     };
 
-  if (shootY < 0) {
-    shootState = false;
-    shootY = canvas.height - paddingY*4;
-  };
+  enemysDestroy();
 
 };
 
@@ -188,36 +270,3 @@ setInterval(draw, 10);
 
 // Draw enemy fonctions
 
-// function drawBodyEnemy() {
-//   ctx.beginPath();
-//   ctx.rect(canvas.width/2-pixel*3, canvas.height/2-pixel*2, pixel*7, pixel*5);
-//   ctx.rect(canvas.width/2 - pixel*3, canvas.height/2 + pixel*3, pixel, pixel);
-//   ctx.rect(canvas.width/2 + pixel*3, canvas.height/2 + pixel*3, pixel, pixel);
-//   ctx.rect(canvas.width/2 - pixel*2, canvas.height/2 + pixel*4, pixel*2, pixel);
-//   ctx.rect(canvas.width/2 + pixel, canvas.height/2 + pixel*4, pixel*2, pixel);
-//   ctx.rect(canvas.width/2 - pixel*5, canvas.height/2 + pixel, pixel, pixel*3);
-//   ctx.rect(canvas.width/2 + pixel*5, canvas.height/2 + pixel, pixel, pixel*3);
-//   ctx.rect(canvas.width/2 - pixel*5, canvas.height/2, pixel*11, pixel);
-//   ctx.rect(canvas.width/2 - pixel*4, canvas.height/2 - pixel, pixel*9, pixel);
-//   ctx.rect(canvas.width/2 - pixel*2, canvas.height/2 - pixel*3, pixel*5, pixel);
-//   ctx.rect(canvas.width/2 - pixel*3, canvas.height/2 - pixel*4, pixel*7, pixel);
-//   ctx.fillStyle = "white";
-//   ctx.fill();
-//   ctx.closePath();
-// };
-
-// function drawEyesEnemy() {
-//   ctx.beginPath();
-//   ctx.rect(canvas.width/2 - pixel*2, canvas.height/2, pixel, pixel);
-//   ctx.rect(canvas.width/2 + pixel*2, canvas.height/2, pixel, pixel);
-//   ctx.rect(canvas.width/2 - pixel, canvas.height/2 - pixel*3, pixel*3, pixel);
-//   ctx.rect(canvas.width/2 - pixel*2, canvas.height/2 - pixel*4, pixel*5, pixel);
-//   ctx.fillStyle = "black";
-//   ctx.fill();
-//   ctx.closePath();
-// };
-
-// function drawEnemy() {
-//   drawBodyEnemy();
-//   drawEyesEnemy();
-// };

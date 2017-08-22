@@ -12,12 +12,18 @@ var dX = 10;
 var rightPressed = false;
 var leftPressed = false;
 
+var score = 0;
 // my personnal pixel unity for the game
 var pixel = canvas.width/200;
-var offsetEnemyX = pixel*17;
-var offsetEnemyY = pixel*11;
 var nEnemyC = 10;
 var nEnemyR = 5;
+var paddingEnemyX = 5*pixel;
+var paddingEnemyY = 5*pixel;
+var offsetEnemyX = pixel*12 + paddingEnemyX;
+var offsetEnemyY = pixel*7 + paddingEnemyY;
+var dEX = 0;
+var dEY = 0;
+var direction = 1;
 
 var enemys = [];
 for (n=0; n<nEnemyC; n++) {
@@ -88,6 +94,12 @@ function keyUpShoot(e) {
 
 
 // This part of the code allow to create the player's character
+function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "white";
+  ctx.fillText("Score: "+ score, 30, 30);
+}
+
 function drawPlayer() {
   ctx.beginPath();
   ctx.rect(playerX + paddingX*2/5, (playerY - paddingY*3), paddingX*2/10, paddingY);
@@ -133,21 +145,39 @@ function drawEnemy(x, y) {
   drawEyesEnemy(x, y);
 };
 
+
 function drawEnemys() {
   for (n=0; n<nEnemyC; n++) {
     for (r=0; r<nEnemyR; r++) {
         if(enemys[n][r].status == 1) {
-          var enemyX = (n*offsetEnemyX) + canvas.width/10;
-          var enemyY = (r*offsetEnemyY) + offsetEnemyY;
+          var enemyX = (n*offsetEnemyX) + canvas.width/10 + dEX;
+          var enemyY = (r*offsetEnemyY) + canvas.height/10 + dEY;
           enemys[n][r].x = enemyX;
           enemys[n][r].y = enemyY;
           drawEnemy(enemyX, enemyY);
         }
       }
     }
-}
+};
 
-function enemysDestroy(){
+function enemysMove() {
+  var last = enemys.length - 1;
+  var last2 = enemys[last].length - 1;
+  if (enemys[last][last2].x >= canvas.width - paddingEnemyX) {
+    direction = 0;
+    dEY += pixel*12;
+  } else if (enemys[0][0].x <= 0 + paddingEnemyX) {
+    direction = 1;
+    dEY += pixel*12;
+  };
+  if (direction == 1) {
+    dEX += 1;
+  } else if (direction == 0) {
+    dEX -= 1;
+  };
+};
+
+function enemysDestroy() {
   for (n=0; n<nEnemyC; n++) {
     for (r=0; r<nEnemyR; r++) {
         var enemy = enemys[n][r];
@@ -158,11 +188,11 @@ function enemysDestroy(){
             shootState = false;
             enemy.status = 0;
             shootY = canvas.height - paddingY*4;
-            // score++;
-            // if(score == brickRowCount*brickColumnCount) {
-            //   alert('You completed the game ! Congradultions !');
-            //   document.location.reload();
-            // }
+            score++;
+            if(score == nEnemyC*nEnemyR) {
+              alert('You completed the game ! Congradulations !');
+              document.location.reload();
+            }
           } else if (shootY <= 0) {
             shootState = false;
             shootY = canvas.height - paddingY*4;
@@ -170,7 +200,7 @@ function enemysDestroy(){
         }
       }
     }
-}
+};
 
 // Code to shoot function
 function drawShoot() {
@@ -185,9 +215,10 @@ function drawShoot() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   drawPlayer();
   drawEnemys();
+  enemysMove();
+  drawScore();
   //This code define the move on left/right and the speed
   if(rightPressed && playerX < canvas.width - paddingX/2) {
     playerX += dX;
@@ -201,9 +232,7 @@ function draw() {
       drawShoot();
       shootY -= dY;
     };
-
   enemysDestroy();
-
 };
 
 setInterval(draw, 10);

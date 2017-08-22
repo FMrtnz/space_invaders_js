@@ -20,7 +20,7 @@ var nEnemyR = 5;
 var paddingEnemyX = 5*pixel;
 var paddingEnemyY = 5*pixel;
 var offsetEnemyX = pixel*12 + paddingEnemyX;
-var offsetEnemyY = pixel*7 + paddingEnemyY;
+var offsetEnemyY = pixel*5 + paddingEnemyY;
 var dEX = 0;
 var dEY = 0;
 var direction = 1;
@@ -32,6 +32,9 @@ for (n=0; n<nEnemyC; n++) {
       enemys[n][r] = {x: 0, y: 0, status: 1};
   }
 }
+
+var last = enemys.length - 1;
+var last2 = enemys[last].length - 1;
 
 // variables for shooting
 var shootState = false;
@@ -161,15 +164,19 @@ function drawEnemys() {
 };
 
 function enemysMove() {
-  var last = enemys.length - 1;
-  var last2 = enemys[last].length - 1;
-  if (enemys[last][last2].x >= canvas.width - paddingEnemyX) {
-    direction = 0;
-    dEY += pixel*12;
-  } else if (enemys[0][0].x <= 0 + paddingEnemyX) {
-    direction = 1;
-    dEY += pixel*12;
-  };
+  for (n=0; n<nEnemyC; n++) {
+    for (r=0; r<nEnemyR; r++) {
+        if(enemys[n][r].status == 1) {
+          if (enemys[n][r].x >= canvas.width - paddingEnemyX) {
+            direction = 0;
+            dEY += pixel*5;
+          } else if (enemys[n][r].x <= 0 + paddingEnemyX) {
+            direction = 1;
+            dEY += pixel*5;
+          };
+        }
+      }
+    }
   if (direction == 1) {
     dEX += 1;
   } else if (direction == 0) {
@@ -177,7 +184,17 @@ function enemysMove() {
   };
 };
 
-function enemysDestroy() {
+function gameOver(n, r) {
+  if(score == nEnemyC*nEnemyR) {
+    alert('You completed the game ! You win !');
+    document.location.reload();
+  } else if (enemys[n][r].y >= canvas.height) {
+    alert('You lose ! Game Over !')
+    document.location.reload();
+  }
+};
+
+function gameStatus() {
   for (n=0; n<nEnemyC; n++) {
     for (r=0; r<nEnemyR; r++) {
         var enemy = enemys[n][r];
@@ -189,18 +206,16 @@ function enemysDestroy() {
             enemy.status = 0;
             shootY = canvas.height - paddingY*4;
             score++;
-            if(score == nEnemyC*nEnemyR) {
-              alert('You completed the game ! Congradulations !');
-              document.location.reload();
-            }
           } else if (shootY <= 0) {
             shootState = false;
             shootY = canvas.height - paddingY*4;
-          };
-        }
+          }
+        };
+       gameOver(n, r)
       }
     }
 };
+
 
 // Code to shoot function
 function drawShoot() {
@@ -219,6 +234,7 @@ function draw() {
   drawEnemys();
   enemysMove();
   drawScore();
+
   //This code define the move on left/right and the speed
   if(rightPressed && playerX < canvas.width - paddingX/2) {
     playerX += dX;
@@ -226,76 +242,13 @@ function draw() {
   else if(leftPressed && playerX > 0 - paddingX/2) {
     playerX -= dX;
   };
-
   //This code allow the player to shoot
   if (shootState == true) {
       drawShoot();
       shootY -= dY;
-    };
-  enemysDestroy();
+  };
+
+  gameStatus()
 };
 
 setInterval(draw, 10);
-
-// if (shootY < 0) {
-//   shootState = false;
-//   shootY = canvas.height - paddingY*4;
-// };
-
-// function player1Win() {
-//   if(xBall == canvas.width) {
-//     score1 ++;
-
-// function ball() {
-//   ctx.beginPath();
-//   ctx.arc(xBall, yBall, paddingBall, 0, Math.PI*2, false);
-//   ctx.fillStyle = "white";
-//   ctx.fill();
-//   ctx.closePath();
-// }
-
-// function ballMoving() {
-//   xBall += dxBall;
-//   yBall += dyBall;
-//   if(yBall < paddingBall || yBall > canvas.height - paddingBall) {
-//     dyBall = -dyBall;
-//   }
-// }
-
-// function collisionDetection() {
-//   // collisionDetection playe - paddingX/2r 2
-//   if(   > y2 && yBall < y2 + paddingY && xBall == collision2  {
-//     dxBall = -dxBall;
-//   }
-//   //    player - paddingX/2
-//   if(yBall > y11 && yB
-//     xBall = collision;
-// }
-
-// function drawScore1() {
-//   ctx.font = "50px Ar
-// if (shootState == true) {
-//   drawShoot(playerX);
-//   shootY -= dY;
-// };
-
-// if (shootY < 0) {
-//   shootState = false;
-//   shootY = canvas.height - paddingY*4;
-// };
-
-// function player1Win() {
-//   if(xBall == canvas.width) {
-//     score1 ++;ial";
-//   ctx.fillStyle = "gray";
-//   ctx.fillText(score1, canvas.width/4, 50);
-// }
-
-// function drawScore2() {
-//   ctx.font = "50px Arial";
-//   ctx.fillStyle = "gray";
-//   ctx.fillText(score2, (canvas.width*3)/4, 50);
-// }
-
-// Draw enemy fonctions
-

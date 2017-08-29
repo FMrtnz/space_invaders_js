@@ -7,10 +7,24 @@
   background: black;
   display: block;
   margin: 0 auto;
+  width: 40%;
+  height: 80%;
 }
 
 span {
   background: white;
   margin: auto auto;
   padding: 10px;
+}
+
+#commandes {
+  position: absolute;
+  left: 5%;
+  top: 10%;
+  text-align: center;
+  /*z-index: -1;*/
+}
+
+#commandes * {
+  margin-top: 5%;
 }

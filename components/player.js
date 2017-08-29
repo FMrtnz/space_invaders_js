@@ -19,7 +19,7 @@ function drawShoot(x, y, padding) {
 
 // This part of the code allow to create the player's character
 function drawScore(score) {
-    ctx.font = "16px Arial";
+    ctx.font = "16px Fantasy";
     ctx.fillStyle = "white";
     ctx.fillText("Score: " + score, 30, 30);
 }

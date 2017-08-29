@@ -101,12 +101,12 @@ function keyUpShoot(e) {
 function gameOver(n, r) {
     if (score == nEnemyC * nEnemyR) {
         setTimeout(function() {
-          alert('You completed the game ! You win !')
+          alert('You completed the game ! You win ! (click OK to restart)')
           document.location.reload();
         }, 50);
         // alert('You completed the game ! You win !');
     } else if (enemys[n][r].y >= canvas.height - offsetEnemyY) {
-        alert('You lose ! Game Over !')
+        alert('You lose ! Game Over ! (click OK to restart)')
         document.location.reload();
     }
 };
